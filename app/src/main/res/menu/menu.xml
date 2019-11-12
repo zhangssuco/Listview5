@@ -1,0 +1,38 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.scrollable19.ScrollingActivity">
+    <item
+        android:id="@+id/loadfromtext"
+        android:orderInCategory="100"
+        android:title="Load from the internal private text"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/delete"
+        android:orderInCategory="100"
+        android:title="Delete a Record"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/add"
+        android:orderInCategory="100"
+        android:title="Add a new Record"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/save"
+        android:orderInCategory="100"
+        android:title="Save the file"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/showsharedpreferences"
+        android:orderInCategory="100"
+        android:title="Show Shared Preferences"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/updatesharedpreferences"
+        android:orderInCategory="100"
+        android:title="Flip Shared Preferences"
+        app:showAsAction="never" />
+
+
+
+</menu>
