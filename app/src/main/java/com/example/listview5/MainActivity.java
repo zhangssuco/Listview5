@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -101,7 +102,18 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.loadfromtext) {
-            loadfromtext(filename);
+
+            Toast.makeText(getApplicationContext(),"Internal or Assset?"+
+                            String.valueOf(pref.getBoolean("internalstorage", false)),
+                    Toast.LENGTH_LONG).show();
+            if (pref.getBoolean("internalstorage", false)==false) {
+                Toast.makeText(getApplicationContext(),"load from asset readonly", Toast.LENGTH_LONG).show();
+                loadfromtext(filename);
+            }
+            else {
+                Toast.makeText(getApplicationContext(),"load from internal", Toast.LENGTH_LONG).show();
+                readfromFile(this);
+            }
             handlelistview();
             return true;
         }
@@ -145,11 +157,39 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    File dir=null;
+
+    private String readfromFile(Context context) {
+        //File fileEvents = new File(context.getFilesDir()+"//mydir//tt.txt");
+        StringBuilder text = new StringBuilder();
+
+        try {
+            dir = new File(context.getFilesDir(),"mydir");
+            File f = new File(dir, filename);
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            myList.clear();
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                String []items=line.split(",");
+                HashMap<String,String> temp;
+                temp = new HashMap<String,String>();
+                temp.put("ID",items[0]);
+                temp.put("Name", items[1]);
+                temp.put("Mascot", items[2]);
+                myList.add(temp);
+            }
+            br.close();
+
+        } catch (IOException e) { }
+        String result = text.toString();
+        return result;
+    }
+
 
     private void writeToFile(Context context) {
         try {
-
-            File dir = new File(context.getFilesDir(),"mydir");
+            dir = new File(context.getFilesDir(),"mydir");
             if(!dir.exists()){
                 dir.mkdir();
             }
@@ -161,14 +201,16 @@ public class MainActivity extends AppCompatActivity {
                 HashMap<String, String> temp=myList.get(counter);
                 String data=temp.get("ID")+"," +temp.get("Name")+","+temp.get("Mascot")+"\n";
                 writer.append(data);
-
-
             }
-
-
             writer.flush();
             writer.close();
 
+            editor.putBoolean("internalstorage", true);
+            editor.commit(); // commit changes
+
+            Toast.makeText(getApplicationContext(),"Write to internal"+
+                    String.valueOf(pref.getBoolean("internalstorage", false)),
+                    Toast.LENGTH_LONG).show();
         }
         catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
@@ -188,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
     void flipsharedpreferences()
     {
         SharedPreferences.Editor editor = pref.edit();
-
         if (pref.getInt("choice", -1)==1) {
             editor.putInt("choice", 0);
             filename=pref.getString("filename1", null);
@@ -201,13 +242,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     SharedPreferences pref;
+    SharedPreferences.Editor editor;
+
     void initializesharedpreferences()
     {
         pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
-        SharedPreferences.Editor editor = pref.edit();
+        editor = pref.edit();
         editor.putString("filename1", "campuses.txt"); // Storing string
         editor.putString("filename2", "campuses2.txt"); // Storing integer
         editor.putInt("choice", 0);
+        //editor.putBoolean("internalstorage", false);
         editor.commit(); // commit changes
     }
 
