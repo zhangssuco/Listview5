@@ -15,8 +15,14 @@
     <item
         android:id="@+id/add"
         android:orderInCategory="100"
-        android:title="Add a new Record"
+        android:title="Add a new dumb Record"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/add2"
+        android:orderInCategory="100"
+        android:title="Add a new Record based on user input"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/save"
         android:orderInCategory="100"

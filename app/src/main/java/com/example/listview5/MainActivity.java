@@ -1,6 +1,16 @@
 package com.example.listview5;
 
+/*
+* Learning objectives
+* read only csv text file in asset folder
+* read and write internal text file
+* use alertdialog
+* use shared preferences
+* */
+
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,10 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -26,8 +39,8 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final ArrayList<HashMap<String,String>> myList =
-            new ArrayList<HashMap<String,String>>();
+    static final ArrayList<HashMap<String, String>> myList =
+            new ArrayList<HashMap<String, String>>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,16 +50,16 @@ public class MainActivity extends AppCompatActivity {
         populateListdatamodel();
         initializesharedpreferences();
     }
-    private void handlelistview()
-    {
+
+    private void handlelistview() {
 
         final ListView sunycampuseslv = (ListView) findViewById(R.id.leaderboard);
         final SimpleAdapter adapter = new SimpleAdapter(
                 this,
                 myList,
                 R.layout.persunycampus,
-                new String[] {"ID","Name","Mascot"},
-                new int[] {R.id.id,R.id.name, R.id.mascot}
+                new String[]{"ID", "Name", "Mascot"},
+                new int[]{R.id.id, R.id.name, R.id.mascot}
         );
 
         sunycampuseslv.setAdapter(adapter);
@@ -54,34 +67,92 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String s = sunycampuseslv.getItemAtPosition(i).toString();
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), String.valueOf(i)+ ":" +s , Toast.LENGTH_LONG).show();
             }
         });
 
     }
-    private void populateListdatamodel() {
-        HashMap<String,String> temp;
 
-        temp = new HashMap<String,String>();
-        temp.put("ID","SUCO");
+    private void populateListdatamodel() {
+        HashMap<String, String> temp;
+
+        temp = new HashMap<String, String>();
+        temp.put("ID", "SUCO");
         temp.put("Name", "SUNY Oneonta");
         temp.put("Mascot", "Red Dragon");
         myList.add(temp);
 
-        temp = new HashMap<String,String>();
-        temp.put("ID","Albany");
+        temp = new HashMap<String, String>();
+        temp.put("ID", "Albany");
         temp.put("Name", "SUNY Albany");
         temp.put("Mascot", "Dane");
         myList.add(temp);
 
-        for(int i=0; i<50; i++){
-            temp = new HashMap<String,String>();
-            temp.put("ID","Binghamton");
+        for (int i = 0; i < 50; i++) {
+            temp = new HashMap<String, String>();
+            temp.put("ID", "Binghamton");
             temp.put("Name", "SUNY Bing");
             temp.put("Mascot", "something?");
             myList.add(temp);
         }
 
+    }
+
+
+
+    /*
+     * This function demonstrate several concpets
+     * How to programmatically create a layout on the fly
+     * You can certainly create a layout XML for dialog boxes as well.
+     * Before calling your Dialog just do:
+     * myDialog.setContentView(R.layout.my_dialog_layout);
+     * Using a relatively lightweighted Dialogbox to take input
+     * Toast
+     * */
+
+    private HashMap<String, String> getanewrecord(Context c) {
+        final HashMap<String, String> temp = new HashMap<String, String>();
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        LinearLayout lila1 = new LinearLayout(this);
+        lila1.setOrientation(LinearLayout.VERTICAL); //1 is for vertical orientation
+
+        final EditText IDEditText = new EditText(c);
+        final EditText NameEditText = new EditText(c);
+        final EditText MoscotEditText = new EditText(c);
+
+        lila1.addView(IDEditText);
+        lila1.addView(NameEditText);
+        lila1.addView(MoscotEditText);
+
+        alert.setView(lila1);
+
+        alert.setIcon(R.drawable.ic_launcher_background);
+        alert.setTitle("Input id, name and mascot in the following three boxes!");
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = IDEditText.getText().toString().trim();
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+                temp.put("ID", IDEditText.getText().toString().trim());
+                temp.put("Name", NameEditText.getText().toString().trim());
+                temp.put("Mascot", MoscotEditText.getText().toString().trim());
+
+                temp.put("Confirm", "true");
+
+            }
+        });
+        alert.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        temp.put("Confirm", "false");
+                        dialog.cancel();
+                    }
+                });
+        alert.create();
+
+        alert.show();
+
+        return temp;
     }
 
 
@@ -133,6 +204,20 @@ public class MainActivity extends AppCompatActivity {
             temp.put("Name", "tester");
             temp.put("Mascot", "tester");
             myList.add(temp);
+            handlelistview();
+
+            return true;
+        }
+
+        if (id == R.id.add2) {
+
+            HashMap<String,String> temp=getanewrecord(this);
+
+            if (temp!=null)
+                // there is a wierd issue here. I commented it out!
+                //Toast.makeText(this, temp.toString()+(temp.get("Confirm")+temp.get("ID")), Toast.LENGTH_LONG).show();
+                //if(String.valueOf(temp.get("Confirm")).equals("true"))
+                 myList.add(temp);
             handlelistview();
 
             return true;
