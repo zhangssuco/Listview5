@@ -113,32 +113,58 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String, String> getanewrecord(Context c) {
         final HashMap<String, String> temp = new HashMap<String, String>();
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        //outer vertical layout
         LinearLayout lila1 = new LinearLayout(this);
-        lila1.setOrientation(LinearLayout.VERTICAL); //1 is for vertical orientation
+        lila1.setOrientation(LinearLayout.VERTICAL);
 
         final EditText IDEditText = new EditText(c);
-        final EditText NameEditText = new EditText(c);
-        final EditText MoscotEditText = new EditText(c);
-
         lila1.addView(IDEditText);
+
+        final EditText NameEditText = new EditText(c);
         lila1.addView(NameEditText);
-        lila1.addView(MoscotEditText);
+
+        //notice that here, I used a nested inner linearlayout, but horicontally
+        LinearLayout moscotline = new LinearLayout(this);
+        moscotline.setOrientation(LinearLayout.HORIZONTAL);
+        final EditText MoscotEditText = new EditText(c);
+        final EditText MoscotPrompt = new EditText(c); // TextView better
+        MoscotPrompt.setText("Moscot Name: ");
+        LinearLayout.LayoutParams leftparam = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1.0f
+        );
+        LinearLayout.LayoutParams rightparam = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                2.0f
+        );
+        MoscotPrompt.setLayoutParams(leftparam);
+        MoscotEditText.setLayoutParams(rightparam);
+
+        //MoscotPrompt.setEnabled(false);
+        MoscotPrompt.setFocusable(false);
+        moscotline.addView(MoscotPrompt);
+        moscotline.addView(MoscotEditText);
+
+        lila1.addView(moscotline);
 
         alert.setView(lila1);
 
         alert.setIcon(R.drawable.ic_launcher_background);
-        alert.setTitle("Input id, name and mascot in the following three boxes!");
+        alert.setTitle("Input id, name and mascot in the following three boxes to create a new record!");
 
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String value = IDEditText.getText().toString().trim();
                 Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+
                 temp.put("ID", IDEditText.getText().toString().trim());
                 temp.put("Name", NameEditText.getText().toString().trim());
                 temp.put("Mascot", MoscotEditText.getText().toString().trim());
 
                 temp.put("Confirm", "true");
-
+                myList.add(temp);
             }
         });
         alert.setNegativeButton("Cancel",
@@ -211,15 +237,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.add2) {
 
-            HashMap<String,String> temp=getanewrecord(this);
-
-            if (temp!=null)
-                // there is a wierd issue here. I commented it out!
-                //Toast.makeText(this, temp.toString()+(temp.get("Confirm")+temp.get("ID")), Toast.LENGTH_LONG).show();
-                //if(String.valueOf(temp.get("Confirm")).equals("true"))
-                 myList.add(temp);
-            handlelistview();
-
+            HashMap<String, String> temp = getanewrecord(this);
+            // nonblocking, asychronous ..
+            if (temp != null)
+            {
+                Toast.makeText(this, temp.toString() + (temp.get("Confirm") + temp.get("ID")), Toast.LENGTH_LONG).show();
+            }
+            //handlelistview();
             return true;
         }
 
@@ -239,6 +263,12 @@ public class MainActivity extends AppCompatActivity {
             flipsharedpreferences();
             return true;
         }
+
+        if (id == R.id.exit) {
+            quitapp();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -376,6 +406,52 @@ public class MainActivity extends AppCompatActivity {
         }
 
         handlelistview();
+    }
+
+
+    void quitapp()
+    {
+        // alertdialog for exit the app
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // set the title of the Alert Dialog
+        alertDialogBuilder.setTitle("Do you really want to leave the app?");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("CSCI 268 Fall 2019")
+                .setCancelable(false)
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int id) {
+                        // what to do if YES is tapped
+                        finishAffinity();
+                        System.exit(0);
+                    }
+                })
+
+        .setNeutralButton("CANCEL",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,
+                                    int id) {
+                    // code to do on CANCEL tapped
+                    dialog.cancel();
+                }
+            })
+
+        .setNegativeButton("NO",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,
+                                    int id) {
+                    // code to do on NO tapped
+                    dialog.cancel();
+                }
+            });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.show();
+
     }
 }
 

@@ -40,5 +40,10 @@
         app:showAsAction="never" />
 
 
+    <item
+        android:id="@+id/exit"
+        android:orderInCategory="100"
+        android:title="Exit the App?"
+        app:showAsAction="never" />
 
 </menu>
